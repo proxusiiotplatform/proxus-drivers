@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>Proxus.Drivers.OpcUa.Read</AssemblyName>
+        <RootNamespace>Proxus.Drivers.OpcUa.Read</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../../src/Proxus.Drivers.OpcUa/Proxus.Drivers.OpcUa.csproj"/>
+    </ItemGroup>
+</Project>

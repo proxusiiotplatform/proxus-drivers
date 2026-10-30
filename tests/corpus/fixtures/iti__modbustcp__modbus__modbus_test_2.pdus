@@ -1,0 +1,21 @@
+# capture: iti/modbustcp/modbus/modbus_test_2
+# source: https://raw.githubusercontent.com/ITI/ICS-Security-Tools/9b826091e7ba3fbdd5997d31e116f29e09cbbb48/pcaps/ModbusTCP/Modbus/modbus_test_2.pcap
+# sha256: 2d6843311b9ce1144cb2568d78b16c8d9264960c51e5d826ee4824575ff80ccc
+# license: CC-BY-4.0
+# origin: ITI/ICS-Security-Tools (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	modbus	1	C	1	0	0ab700000006020400000002	trans_id=2743;unit_id=2;func_code=4;reference_num=0;word_cnt=2
+P	modbus	2	C	2	0	0ab80000000601040000000e	trans_id=2744;unit_id=1;func_code=4;reference_num=0;word_cnt=14
+P	modbus	-1	S	3	0	0ab5000000070104040000559c	trans_id=2741;unit_id=1;func_code=4;byte_cnt=4;regval_uint16=0,21916
+P	modbus	3	C	4	0	0ab90000000602040000000e	trans_id=2745;unit_id=2;func_code=4;reference_num=0;word_cnt=14
+P	modbus	2	S	6	0	0ab80000001f01041c0000559c000000000000000000003a50000000000000000000007025	trans_id=2744;unit_id=1;func_code=4;byte_cnt=28;regval_uint16=0,21916,0,0,0,0,0,14928,0,0,0,0,0,28709;expert.group=33554432
+P	modbus	1	S	9	0	0ab700000007020404000059fb	trans_id=2743;unit_id=2;func_code=4;byte_cnt=4;regval_uint16=0,23035;expert.group=33554432
+P	modbus	5	C	10	0	0abb00000006070400040001	trans_id=2747;unit_id=7;func_code=4;reference_num=4;word_cnt=1
+P	modbus	5	S	12	0	0abb0000000507040203e8	trans_id=2747;unit_id=7;func_code=4;byte_cnt=2;regval_uint16=1000;expert.group=33554432
+P	modbus	8	C	17	0	0abe00000006020400000002	trans_id=2750;unit_id=2;func_code=4;reference_num=0;word_cnt=2
+P	modbus	14	C	29	1	00000000000601040001000e	trans_id=0;unit_id=1;func_code=4;reference_num=1;word_cnt=14
+P	modbus	14	S	37	1	00000000001f01041c000055c5000000000000000000003ab600000000000000000000705e	trans_id=0;unit_id=1;func_code=4;byte_cnt=28;regval_uint16=0,21957,0,0,0,0,0,15030,0,0,0,0,0,28766
+P	modbus	18	C	38	1	00000000000602040001000e	trans_id=0;unit_id=2;func_code=4;reference_num=1;word_cnt=14
+P	modbus	141	C	292	8	000000000006070300040002	trans_id=0;unit_id=7;func_code=3;reference_num=4;word_cnt=2
+P	modbus	141	S	293	8	00000000000707030403e836c1	trans_id=0;unit_id=7;func_code=3;byte_cnt=4;regval_uint16=1000,14017

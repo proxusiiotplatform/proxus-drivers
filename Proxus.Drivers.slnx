@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Proxus.Drivers.Abstractions/Proxus.Drivers.Abstractions.csproj" />
+    <Project Path="src/Proxus.Drivers.Core/Proxus.Drivers.Core.csproj" />
+    <Project Path="src/Proxus.Drivers.Modbus/Proxus.Drivers.Modbus.csproj" />
+    <Project Path="src/Proxus.Drivers.OpcUa/Proxus.Drivers.OpcUa.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Proxus.Drivers.Abstractions.SelfTests/Proxus.Drivers.Abstractions.SelfTests.csproj" />
+    <Project Path="tests/Proxus.Drivers.Modbus.SelfTests/Proxus.Drivers.Modbus.SelfTests.csproj" />
+    <Project Path="tests/Proxus.Drivers.OpcUa.SelfTests/Proxus.Drivers.OpcUa.SelfTests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Proxus.Drivers.Modbus.Read/Proxus.Drivers.Modbus.Read.csproj" />
+    <Project Path="samples/Proxus.Drivers.OpcUa.Read/Proxus.Drivers.OpcUa.Read.csproj" />
+  </Folder>
+</Solution>

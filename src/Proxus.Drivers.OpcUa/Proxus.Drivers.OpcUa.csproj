@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ProxusNuGetPackage>true</ProxusNuGetPackage>
+        <Description>Native OPC UA client for .NET 10 with no external stack: secure channels (Basic256Sha256, Aes256_Sha256_RsaPss), sessions with reactivation, read, write, browse, subscriptions, events, history and methods. Native AOT compatible.</Description>
+        <PackageTags>proxus;industrial;iiot;driver;native-aot;opc-ua;opcua;iec62541</PackageTags>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Proxus.Drivers.Abstractions/Proxus.Drivers.Abstractions.csproj"/>
+        <ProjectReference Include="../Proxus.Drivers.Core/Proxus.Drivers.Core.csproj"/>
+    </ItemGroup>
+</Project>

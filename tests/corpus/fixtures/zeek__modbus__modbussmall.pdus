@@ -1,0 +1,11 @@
+# capture: zeek/modbus/modbussmall
+# source: https://raw.githubusercontent.com/zeek/zeek/048d1918063c19ff47e42a02f6c674b9349024f1/testing/btest/Traces/modbus/modbusSmall.pcap
+# sha256: 329b4d75bb65d48102816b9d1b61015e7e03003bd38d70cc627522d9da2d46eb
+# license: BSD-3-Clause
+# origin: zeek/zeek (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	modbus	1	C	4	0	000100000008010f000000030100	trans_id=1;unit_id=1;func_code=15;reference_num=0;bit_cnt=3;byte_cnt=1
+P	modbus	1	S	6	0	000100000006010f00000003	trans_id=1;unit_id=1;func_code=15;reference_num=0;bit_cnt=3
+P	modbus	2	C	14	1	000100000006010100000003	trans_id=1;unit_id=1;func_code=1;reference_num=0;bit_cnt=3
+P	modbus	2	S	16	1	00010000000401010100	trans_id=1;unit_id=1;func_code=1;byte_cnt=1

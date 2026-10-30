@@ -1,0 +1,11 @@
+# capture: zeek/modbus/modbus-eit
+# source: https://raw.githubusercontent.com/zeek/zeek/048d1918063c19ff47e42a02f6c674b9349024f1/testing/btest/Traces/modbus/modbus-eit.pcap
+# sha256: c40e925647080f2c094810c8c1d4472a6e097009f39d621bc55f96c599e5d1b9
+# license: BSD-3-Clause
+# origin: zeek/zeek (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	modbus	1	C	1	0	000000000005002b0e0100	trans_id=0;unit_id=0;func_code=43
+P	modbus	1	S	2	0	00000000000c002b0e01004db70000000000	trans_id=0;unit_id=0;func_code=43
+P	modbus	2	C	3	1	000000000005ff2b0e0100	trans_id=0;unit_id=255;func_code=43
+P	modbus	2	S	4	1	000000000003ffab04	trans_id=0;unit_id=255;func_code=43;exception_code=4

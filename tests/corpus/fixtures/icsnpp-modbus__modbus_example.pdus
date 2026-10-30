@@ -1,0 +1,53 @@
+# capture: icsnpp-modbus/modbus_example
+# source: https://raw.githubusercontent.com/cisagov/icsnpp-modbus/6dd3dab173169e454a73925d0426d3c019104852/testing/traces/modbus_example.pcap
+# sha256: a84656f9af62b2c948200ec288d51b81f03037c277a31a40efee0cfb244f1e30
+# license: BSD-3-Clause
+# origin: cisagov/icsnpp-modbus (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	modbus	1	C	4	0	000100000006040100010001	trans_id=1;unit_id=4;func_code=1;reference_num=1;bit_cnt=1
+P	modbus	1	S	6	0	00010000000404010101	trans_id=1;unit_id=4;func_code=1;byte_cnt=1
+P	modbus	2	C	8	0	000200000006050100010008	trans_id=2;unit_id=5;func_code=1;reference_num=1;bit_cnt=8
+P	modbus	2	S	10	0	000200000004050101e9	trans_id=2;unit_id=5;func_code=1;byte_cnt=1
+P	modbus	3	C	12	0	000300000006040200010001	trans_id=3;unit_id=4;func_code=2;reference_num=1;bit_cnt=1
+P	modbus	3	S	14	0	00030000000404020100	trans_id=3;unit_id=4;func_code=2;byte_cnt=1
+P	modbus	4	C	16	0	000400000006050200010008	trans_id=4;unit_id=5;func_code=2;reference_num=1;bit_cnt=8
+P	modbus	4	S	18	0	0004000000040502012c	trans_id=4;unit_id=5;func_code=2;byte_cnt=1
+P	modbus	5	C	20	0	000500000006040300010001	trans_id=5;unit_id=4;func_code=3;reference_num=1;word_cnt=1
+P	modbus	5	S	22	0	00050000000504030200aa	trans_id=5;unit_id=4;func_code=3;byte_cnt=2;regval_uint16=170
+P	modbus	6	C	24	0	000600000006050300010008	trans_id=6;unit_id=5;func_code=3;reference_num=1;word_cnt=8
+P	modbus	6	S	26	0	00060000001305031000aa00aa00bb00ccef84e3eb9f8be4c1	trans_id=6;unit_id=5;func_code=3;byte_cnt=16;regval_uint16=170,170,187,204,61316,58347,40843,58561
+P	modbus	7	C	28	0	000700000006040400010001	trans_id=7;unit_id=4;func_code=4;reference_num=1;word_cnt=1
+P	modbus	7	S	30	0	0007000000050404028e2b	trans_id=7;unit_id=4;func_code=4;byte_cnt=2;regval_uint16=36395
+P	modbus	8	C	32	0	000800000006050400010008	trans_id=8;unit_id=5;func_code=4;reference_num=1;word_cnt=8
+P	modbus	8	S	34	0	0008000000130504108e2b1f7b9b4b82511bfadb8f026bae97	trans_id=8;unit_id=5;func_code=4;byte_cnt=16;regval_uint16=36395,8059,39755,33361,7162,56207,619,44695
+P	modbus	9	C	36	0	00090000000606050001ff00	trans_id=9;unit_id=6;func_code=5;reference_num=1
+P	modbus	9	S	38	0	00090000000606050001ff00	trans_id=9;unit_id=6;func_code=5;reference_num=1
+P	modbus	10	C	40	0	000a0000000607060001abcd	trans_id=10;unit_id=7;func_code=6;reference_num=1;regval_uint16=43981
+P	modbus	10	S	42	0	000a0000000607060001abcd	trans_id=10;unit_id=7;func_code=6;reference_num=1;regval_uint16=43981
+P	modbus	11	C	44	0	000b000000020207	trans_id=11;unit_id=2;func_code=7
+P	modbus	11	S	46	0	000b00000003020700	trans_id=11;unit_id=2;func_code=7
+P	modbus	12	C	48	0	000c00000006020800020000	trans_id=12;unit_id=2;func_code=8
+P	modbus	12	S	50	0	000c00000006020800020000	trans_id=12;unit_id=2;func_code=8
+P	modbus	13	C	52	0	000d00000008070f000100040109	trans_id=13;unit_id=7;func_code=15;reference_num=1;bit_cnt=4;byte_cnt=1
+P	modbus	13	S	54	0	000d00000006070f00010004	trans_id=13;unit_id=7;func_code=15;reference_num=1;bit_cnt=4
+P	modbus	14	C	56	0	000e0000000f0710000100040800aa00bb00cc00dd	trans_id=14;unit_id=7;func_code=16;reference_num=1;word_cnt=4;byte_cnt=8;regval_uint16=170,187,204,221
+P	modbus	14	S	58	0	000e00000006071000010004	trans_id=14;unit_id=7;func_code=16;reference_num=1;word_cnt=4
+P	modbus	15	C	60	0	000f000000020211	trans_id=15;unit_id=2;func_code=17
+P	modbus	15	S	62	0	000f000000350211325a65656b204d6f6462757320546573742d50726f746f636f6c2050617273696e672069732066756e212d312e322e332e36ff	trans_id=15;unit_id=2;func_code=17
+P	modbus	16	C	64	0	001000000003081400	trans_id=16;unit_id=8;func_code=20;byte_cnt=0
+P	modbus	16	S	66	0	001000000003081400	trans_id=16;unit_id=8;func_code=20;byte_cnt=0
+P	modbus	17	C	68	0	001100000003081500	trans_id=17;unit_id=8;func_code=21;byte_cnt=0
+P	modbus	17	S	70	0	001100000003081500	trans_id=17;unit_id=8;func_code=21;byte_cnt=0
+P	modbus	18	C	72	0	0012000000080416000adead0000	trans_id=18;unit_id=4;func_code=22;reference_num=10
+P	modbus	18	S	74	0	0012000000080416000adead0000	trans_id=18;unit_id=4;func_code=22;reference_num=10
+P	modbus	20	C	80	0	00140000000d061700010001000200010200ff	trans_id=20;unit_id=6;func_code=23;byte_cnt=2
+P	modbus	20	S	82	0	00140000000506170200aa	trans_id=20;unit_id=6;func_code=23;byte_cnt=2
+P	modbus	21	C	84	0	001500000011061700010004000200030600aa00bb00cc	trans_id=21;unit_id=6;func_code=23;byte_cnt=6
+P	modbus	21	S	86	0	00150000000b06170800aa00aa00bb00cc	trans_id=21;unit_id=6;func_code=23;byte_cnt=8
+P	modbus	22	C	88	0	0016000000040a180000	trans_id=22;unit_id=10;func_code=24;reference_num=0
+P	modbus	22	S	90	0	0016000000060a1800020000	trans_id=22;unit_id=10;func_code=24;word_cnt=0
+P	modbus	23	C	92	0	001700000005012b0e0100	trans_id=23;unit_id=1;func_code=43
+P	modbus	23	S	94	0	00170000003d012b0e018300000300105a65656b204d6f646275732054657374011850726f746f636f6c2050617273696e672069732066756e210207312e322e332e36	trans_id=23;unit_id=1;func_code=43
+P	modbus	24	C	99	1	00010000000600030258000a	trans_id=1;unit_id=0;func_code=3;reference_num=600;word_cnt=10
+P	modbus	24	S	100	1	000100000003008302	trans_id=1;unit_id=0;func_code=3;exception_code=2

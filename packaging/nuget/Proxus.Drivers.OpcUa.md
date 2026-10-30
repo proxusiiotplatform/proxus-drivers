@@ -1,0 +1,24 @@
+# Proxus.Drivers.OpcUa
+
+A native OPC UA client for .NET 10, with no external OPC UA stack: secure channels (None, Basic256Sha256,
+Aes256_Sha256_RsaPss with Sign or SignAndEncrypt), anonymous, user name and certificate sessions that are activated
+again after a lost channel, and Read, Write, Browse, subscriptions, events and alarms, history and method calls. Every
+call returns a result with a structured error instead of throwing; no reflection, Native AOT compatible.
+
+```csharp
+using Proxus.Drivers;
+using Proxus.Drivers.OpcUa;
+
+await using var client = new OpcUaTcpClient(new OpcUaTcpOptions { EndpointUrl = new Uri("opc.tcp://192.168.0.20:4840") });
+var connected = await client.ConnectAsync();
+var session = connected.IsSuccess ? await client.OpenAnonymousSessionAsync() : connected;
+if (!session.IsSuccess)
+    throw new InvalidOperationException(session.Error.ToUserMessage());
+
+var time = await client.ReadAsync(new OpcUaNodeDescriptor(IndustrialNodeId.Numeric(0, 2258)));   // Server CurrentTime
+Console.WriteLine(time.IsSuccess ? time.Value.Value.ToString() : time.Error.ToUserMessage());
+await client.DisconnectAsync();
+```
+
+The package depends on `Proxus.Drivers.Abstractions` and `Proxus.Drivers.Core` at exactly the same version. Open
+source under the Apache License 2.0.

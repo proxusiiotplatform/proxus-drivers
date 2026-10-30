@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ProxusNuGetPackage>true</ProxusNuGetPackage>
+        <Description>Shared runtime helpers of the Proxus industrial drivers: socket I/O and timeout handling used by the protocol packages. Native AOT compatible.</Description>
+        <AssemblyName>Proxus.Drivers.Core</AssemblyName>
+        <RootNamespace>Proxus.Drivers.Core</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Proxus.Drivers.Abstractions/Proxus.Drivers.Abstractions.csproj"/>
+    </ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+# capture: iti/ethernetip/enip_test
+# source: https://raw.githubusercontent.com/ITI/ICS-Security-Tools/9b826091e7ba3fbdd5997d31e116f29e09cbbb48/pcaps/EthernetIP/enip_test.pcap
+# sha256: 0ba6c01fde28912e9f890d839b991cff71cca8e8259e1d93e9c3a312c43bc255
+# license: CC-BY-4.0
+# origin: ITI/ICS-Security-Tools (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	enip	1	C	6	1	63000000000000000000000000000000c1debed100000000	command=0x0063;length=0;session=0x00000000;status=0x00000000;context=0000c1debed1
+P	enip	1	S	7	1	63003300000000000000000000000000c1debed10000000001000c002d0001000002af120a0101a4000000000000000001000c003a00040330008e4d52000b313735362d454e42542f4103	command=0x0063;length=51;session=0x00000000;status=0x00000000;context=00000000c1debed1;cpf.itemcount=1;cpf.typeid=0x000c;lir.vendor=0x0001;lir.devtype=12;lir.prodcode=58;lir.name=1756-ENBT/A

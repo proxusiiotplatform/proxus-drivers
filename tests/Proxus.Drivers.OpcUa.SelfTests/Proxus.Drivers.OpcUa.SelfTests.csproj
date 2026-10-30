@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../../src/Proxus.Drivers.Abstractions/Proxus.Drivers.Abstractions.csproj"/>
+        <ProjectReference Include="../../src/Proxus.Drivers.OpcUa/Proxus.Drivers.OpcUa.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="../corpus/GoldenCorpus.cs" Link="GoldenCorpus/GoldenCorpus.cs"/>
+    </ItemGroup>
+</Project>

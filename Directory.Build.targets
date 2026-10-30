@@ -1,0 +1,43 @@
+<Project>
+    <!-- Validation scripts are explicit and cross-platform; builds do not depend on Python. -->
+
+    <!--
+        NuGet packages (ADR 0042). A project opts in with ProxusNuGetPackage=true; every other project keeps
+        IsPackable=false from Directory.Build.props. The package carries the compiled assembly, its XML documentation,
+        and a readme; PDBs go to the .snupkg. The licence is Apache-2.0 (ADR 0043). No source, Source Link or repository
+        URL leaves the repository until the public repository exists.
+    -->
+    <PropertyGroup Condition="'$(ProxusNuGetPackage)' == 'true'">
+        <IsPackable>true</IsPackable>
+        <PackageId>$(AssemblyName)</PackageId>
+        <Authors>Proxus</Authors>
+        <Company>Proxus</Company>
+        <Product>Proxus.Drivers</Product>
+        <Copyright>Copyright (c) Proxus.</Copyright>
+        <NeutralLanguage>en</NeutralLanguage>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags Condition="'$(PackageTags)' == ''">proxus;industrial;iiot;driver;native-aot</PackageTags>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedAllSources>false</EmbedAllSources>
+        <EnableSourceLink>false</EnableSourceLink>
+        <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+        <PublishRepositoryUrl>false</PublishRepositoryUrl>
+        <RepositoryUrl></RepositoryUrl>
+        <RepositoryType></RepositoryType>
+        <RepositoryCommit></RepositoryCommit>
+        <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=/_/</PathMap>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(ProxusNuGetPackage)' == 'true'">
+        <None Include="$(MSBuildThisFileDirectory)packaging/nuget/$(PackageId).md" Pack="true" PackagePath="/README.md" Visible="false"/>
+    </ItemGroup>
+
+    <!-- The packages ship as one set: each depends on its siblings at exactly its own version ([x.y.z]). -->
+    <Target Name="ProxusExactSiblingVersions" AfterTargets="_GetProjectReferenceVersions" Condition="'$(ProxusNuGetPackage)' == 'true'">
+        <ItemGroup>
+            <_ProjectReferencesWithVersions Update="@(_ProjectReferencesWithVersions)" ProjectVersion="[%(_ProjectReferencesWithVersions.ProjectVersion)]"/>
+        </ItemGroup>
+    </Target>
+</Project>

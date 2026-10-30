@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>Proxus.Drivers.Modbus.Read</AssemblyName>
+        <RootNamespace>Proxus.Drivers.Modbus.Read</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../../src/Proxus.Drivers.Modbus/Proxus.Drivers.Modbus.csproj"/>
+    </ItemGroup>
+</Project>

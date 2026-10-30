@@ -1,0 +1,8 @@
+# capture: iti/ethernetip/cip-eth-set-2
+# source: https://raw.githubusercontent.com/ITI/ICS-Security-Tools/9b826091e7ba3fbdd5997d31e116f29e09cbbb48/pcaps/EthernetIP/cip-eth-set-2.pcap
+# sha256: fe674ddc3e4964c10321dd76f649097c87db6d48091327c6977656a5a3c04b26
+# license: CC-BY-4.0
+# origin: ITI/ICS-Security-Tools (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	enip	-1	S	1	0	6f0014000001021200000000ec6d8601701ee10000000000000000000500020000000000b200040090000000	command=0x006f;length=20;session=0x12020100;status=0x00000000;context=ec6d8601701ee100;cpf.itemcount=2;cpf.typeid=0x0000,0x00b2;service=0x90;genstat=0x00;addstat_size=0

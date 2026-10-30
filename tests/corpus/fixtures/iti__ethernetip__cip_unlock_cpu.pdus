@@ -1,0 +1,8 @@
+# capture: iti/ethernetip/cip_unlock_cpu
+# source: https://raw.githubusercontent.com/ITI/ICS-Security-Tools/9b826091e7ba3fbdd5997d31e116f29e09cbbb48/pcaps/EthernetIP/cip_unlock_cpu.pcap
+# sha256: 26d072e506ffd939b82532b597bdb27684ca79e2abac8ab62b8d65e9ad87313c
+# license: CC-BY-4.0
+# origin: ITI/ICS-Security-Tools (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	enip	1	C	1	0	7000200000010212000000000000000000000000000000000000000001000200a1000400016b0700b1000c004c1c4c04208e240120742401	command=0x0070;length=32;session=0x12020100;status=0x00000000;context=0000000000000000;cpf.itemcount=2;cpf.typeid=0x00a1,0x00b1;service=0x4c;class=0x8e,0x74;instance=0x01,0x01;cpf.cai.connid=0x00076b01;seq=7244;expert.group=150994944

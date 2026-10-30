@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>Proxus.Drivers.Modbus.SelfTests</AssemblyName>
+        <RootNamespace>Proxus.Drivers.Modbus.SelfTests</RootNamespace>
+        <IsAotCompatible>false</IsAotCompatible>
+        <EnableAotAnalyzer>false</EnableAotAnalyzer>
+        <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../../src/Proxus.Drivers.Modbus/Proxus.Drivers.Modbus.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="../corpus/GoldenCorpus.cs" Link="GoldenCorpus/GoldenCorpus.cs"/>
+        <None Include="../corpus/modbus-ascii/*.json" LinkBase="corpus/modbus-ascii" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+</Project>

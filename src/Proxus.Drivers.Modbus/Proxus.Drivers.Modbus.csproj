@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ProxusNuGetPackage>true</ProxusNuGetPackage>
+        <Description>Modbus master for .NET 10 over TCP, with RTU and ASCII framing over a gateway or a stream you open: coils, discrete inputs, holding and input registers, typed values and batched reads, with structured errors and no reflection. Native AOT compatible.</Description>
+        <PackageTags>proxus;industrial;iiot;driver;native-aot;modbus;modbus-tcp;modbus-rtu</PackageTags>
+        <AssemblyName>Proxus.Drivers.Modbus</AssemblyName>
+        <RootNamespace>Proxus.Drivers.Modbus</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Proxus.Drivers.Abstractions/Proxus.Drivers.Abstractions.csproj"/>
+        <ProjectReference Include="../Proxus.Drivers.Core/Proxus.Drivers.Core.csproj"/>
+    </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+# capture: iti/s7/s7comm/s7comm_clean
+# source: https://raw.githubusercontent.com/ITI/ICS-Security-Tools/9b826091e7ba3fbdd5997d31e116f29e09cbbb48/pcaps/s7/S7Comm/s7comm_clean.pcap
+# sha256: 0998a2c0ecdd83e20a0fa166fffb53648ea31f9b62b41cf48841d5419bf127d7
+# license: CC-BY-4.0
+# origin: ITI/ICS-Security-Tools (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	s7	1	C	1	0	0300001f02f080320100003106000e00000401120a10020001000081000000	header.rosctr=1;header.pduref=12550;param.func=0x04;param.itemcount=1;param.item.area=0x81;param.item.db=0;param.item.address.byte=0;param.item.address.bit=0;param.item.transp_size=2;param.item.length=1;type=0x0f
+P	s7	1	S	2	0	0300001a02f0803203000031060002000500000401ff04000800	header.rosctr=3;header.pduref=12550;header.errcls=0x00;header.errcod=0x00;param.func=0x04;param.itemcount=1;data.returncode=0xff;data.transportsize=0x04;data.length=1;type=0x0f
+P	s7	2	C	3	0	0300001f02f080320100003206000e00000401120a10020001000082000000	header.rosctr=1;header.pduref=12806;param.func=0x04;param.itemcount=1;param.item.area=0x82;param.item.db=0;param.item.address.byte=0;param.item.address.bit=0;param.item.transp_size=2;param.item.length=1;type=0x0f
+P	s7	2	S	4	0	0300001a02f0803203000032060002000500000401ff04000800	header.rosctr=3;header.pduref=12806;header.errcls=0x00;header.errcod=0x00;param.func=0x04;param.itemcount=1;data.returncode=0xff;data.transportsize=0x04;data.length=1;type=0x0f
+P	s7	3	C	5	0	0300001f02f080320100003306000e00000401120a10060002000083000030	header.rosctr=1;header.pduref=13062;param.func=0x04;param.itemcount=1;param.item.area=0x83;param.item.db=0;param.item.address.byte=6;param.item.address.bit=0;param.item.transp_size=6;param.item.length=2;type=0x0f
+P	s7	3	S	6	0	0300002102f0803203000033060002000c00000401ff0400400000000000000000	header.rosctr=3;header.pduref=13062;header.errcls=0x00;header.errcod=0x00;param.func=0x04;param.itemcount=1;data.returncode=0xff;data.transportsize=0x04;data.length=8;type=0x0f

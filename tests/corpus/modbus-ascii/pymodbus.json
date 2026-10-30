@@ -1,0 +1,309 @@
+{
+  "source": "PyModbus 3.12.0 ASCII framer over TCP (BSD-3-Clause), against a PyModbus 3.12.0 ASCII server through a recording proxy",
+  "generator": "tools/modbus_ascii_record_vectors.py",
+  "note": "'request' is the master's frame, colon through LF; 'response' is the server's answer; 'decoded' is what the master read from it.",
+  "vectors": [
+    {
+      "name": "read_coils 19",
+      "operation": {
+        "op": "read_coils",
+        "address": 19,
+        "count": 19
+      },
+      "request": ":010100130013D8\r\n",
+      "response": ":0101032449028C\r\n",
+      "decoded": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false
+      ]
+    },
+    {
+      "name": "read_di 196",
+      "operation": {
+        "op": "read_di",
+        "address": 196,
+        "count": 22
+      },
+      "request": ":010200C4001623\r\n",
+      "response": ":010203104208A0\r\n",
+      "decoded": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "name": "read_hr 107",
+      "operation": {
+        "op": "read_hr",
+        "address": 107,
+        "count": 3
+      },
+      "request": ":0103006B00038E\r\n",
+      "response": ":0103060148014B014E12\r\n",
+      "decoded": [
+        328,
+        331,
+        334
+      ]
+    },
+    {
+      "name": "read_ir 8",
+      "operation": {
+        "op": "read_ir",
+        "address": 8,
+        "count": 1
+      },
+      "request": ":010400080001F2\r\n",
+      "response": ":010402800871\r\n",
+      "decoded": [
+        32776
+      ]
+    },
+    {
+      "name": "read_hr 0",
+      "operation": {
+        "op": "read_hr",
+        "address": 0,
+        "count": 125
+      },
+      "request": ":01030000007D7F\r\n",
+      "response": ":0103FA0007000A000D0010001300160019001C001F002200250028002B002E003100340037003A003D0040004300460049004C004F005200550058005B005E006100640067006A006D0070007300760079007C007F008200850088008B008E009100940097009A009D00A000A300A600A900AC00AF00B200B500B800BB00BE00C100C400C700CA00CD00D000D300D600D900DC00DF00E200E500E800EB00EE00F100F400F700FA00FD0100010301060109010C010F011201150118011B011E012101240127012A012D0130013301360139013C013F014201450148014B014E015101540157015A015D0160016301660169016C016F017201750178017B9B\r\n",
+      "decoded": [
+        7,
+        10,
+        13,
+        16,
+        19,
+        22,
+        25,
+        28,
+        31,
+        34,
+        37,
+        40,
+        43,
+        46,
+        49,
+        52,
+        55,
+        58,
+        61,
+        64,
+        67,
+        70,
+        73,
+        76,
+        79,
+        82,
+        85,
+        88,
+        91,
+        94,
+        97,
+        100,
+        103,
+        106,
+        109,
+        112,
+        115,
+        118,
+        121,
+        124,
+        127,
+        130,
+        133,
+        136,
+        139,
+        142,
+        145,
+        148,
+        151,
+        154,
+        157,
+        160,
+        163,
+        166,
+        169,
+        172,
+        175,
+        178,
+        181,
+        184,
+        187,
+        190,
+        193,
+        196,
+        199,
+        202,
+        205,
+        208,
+        211,
+        214,
+        217,
+        220,
+        223,
+        226,
+        229,
+        232,
+        235,
+        238,
+        241,
+        244,
+        247,
+        250,
+        253,
+        256,
+        259,
+        262,
+        265,
+        268,
+        271,
+        274,
+        277,
+        280,
+        283,
+        286,
+        289,
+        292,
+        295,
+        298,
+        301,
+        304,
+        307,
+        310,
+        313,
+        316,
+        319,
+        322,
+        325,
+        328,
+        331,
+        334,
+        337,
+        340,
+        343,
+        346,
+        349,
+        352,
+        355,
+        358,
+        361,
+        364,
+        367,
+        370,
+        373,
+        376,
+        379
+      ]
+    },
+    {
+      "name": "write_coils 172",
+      "operation": {
+        "op": "write_coils",
+        "address": 172,
+        "values": [
+          true
+        ]
+      },
+      "request": ":010500ACFF004F\r\n",
+      "response": ":010500ACFF004F\r\n"
+    },
+    {
+      "name": "write_hr 1",
+      "operation": {
+        "op": "write_hr",
+        "address": 1,
+        "values": [
+          3
+        ]
+      },
+      "request": ":010600010003F5\r\n",
+      "response": ":010600010003F5\r\n"
+    },
+    {
+      "name": "write_coils 19",
+      "operation": {
+        "op": "write_coils",
+        "address": 19,
+        "values": [
+          true,
+          false,
+          true,
+          true,
+          false,
+          false,
+          true,
+          true,
+          true,
+          false
+        ]
+      },
+      "request": ":010F0013000A02CD0103\r\n",
+      "response": ":010F0013000AD3\r\n"
+    },
+    {
+      "name": "write_hr 1",
+      "operation": {
+        "op": "write_hr",
+        "address": 1,
+        "values": [
+          10,
+          258
+        ]
+      },
+      "request": ":01100001000204000A0102DB\r\n",
+      "response": ":011000010002EC\r\n"
+    },
+    {
+      "name": "read_hr 1",
+      "operation": {
+        "op": "read_hr",
+        "address": 1,
+        "count": 2
+      },
+      "request": ":010300010002F9\r\n",
+      "response": ":010304000A0102EB\r\n",
+      "decoded": [
+        10,
+        258
+      ]
+    }
+  ]
+}

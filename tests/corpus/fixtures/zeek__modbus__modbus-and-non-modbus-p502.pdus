@@ -1,0 +1,19 @@
+# capture: zeek/modbus/modbus-and-non-modbus-p502
+# source: https://raw.githubusercontent.com/zeek/zeek/048d1918063c19ff47e42a02f6c674b9349024f1/testing/btest/Traces/modbus/modbus-and-non-modbus-p502.pcap
+# sha256: ef18bb9af83affda8419c77f03e8efb1ca1353c6916525b982dc8823b9076d6d
+# license: BSD-3-Clause
+# origin: zeek/zeek (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	modbus	1	C	4	0	0001000000060a0100000001	trans_id=1;unit_id=10;func_code=1;reference_num=0;bit_cnt=1
+P	modbus	1	S	5	0	0001000000040a010100	trans_id=1;unit_id=10;func_code=1;byte_cnt=1
+P	modbus	2	C	7	0	0001000000060a0100020002	trans_id=1;unit_id=10;func_code=1;reference_num=2;bit_cnt=2
+P	modbus	2	S	8	0	0001000000040a010100	trans_id=1;unit_id=10;func_code=1;byte_cnt=1
+P	modbus	3	C	10	0	0001000000060a0300050002	trans_id=1;unit_id=10;func_code=3;reference_num=5;word_cnt=2
+P	modbus	3	S	11	0	0001000000070a030400090018	trans_id=1;unit_id=10;func_code=3;byte_cnt=4;regval_uint16=9,24
+P	modbus	4	C	13	0	0001000000060a0500020000	trans_id=1;unit_id=10;func_code=5;reference_num=2
+P	modbus	4	S	14	0	0001000000060a0500020000	trans_id=1;unit_id=10;func_code=5;reference_num=2
+P	modbus	5	C	16	0	0001000000060a0500010000	trans_id=1;unit_id=10;func_code=5;reference_num=1
+P	modbus	5	S	17	0	0001000000060a0500010000	trans_id=1;unit_id=10;func_code=5;reference_num=1
+P	modbus	6	C	19	0	0001000000060a060005000b	trans_id=1;unit_id=10;func_code=6;reference_num=5;regval_uint16=11
+P	modbus	6	S	20	0	0001000000060a060005000b	trans_id=1;unit_id=10;func_code=6;reference_num=5;regval_uint16=11

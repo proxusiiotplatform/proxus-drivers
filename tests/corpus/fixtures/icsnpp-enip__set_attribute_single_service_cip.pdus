@@ -1,0 +1,8 @@
+# capture: icsnpp-enip/set_attribute_single_service_cip
+# source: https://raw.githubusercontent.com/cisagov/icsnpp-enip/3fbd32e3d2838d5e2bcd6c9ed79f036d23a0642e/testing/traces/set_attribute_single_service_cip.pcapng
+# sha256: 9b24d02e6f15a40f2109c2476bb117e2273bc9485077a50044269d3738cea8dc
+# license: BSD-3-Clause
+# origin: cisagov/icsnpp-enip (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	enip	1	C	1	0	70001c00f4ffcab4000000005f7079636f6d6d5f00000000000000000a000200a1000400ba629adab10008000d00100220012400	command=0x0070;length=28;session=0xb4cafff4;status=0x00000000;context=5f7079636f6d6d5f;cpf.itemcount=2;cpf.typeid=0x00a1,0x00b1;service=0x10;class=0x01;instance=0x00;cpf.cai.connid=0xda9a62ba;seq=13;expert.group=150994944

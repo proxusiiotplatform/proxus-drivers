@@ -1,0 +1,9 @@
+# capture: iti/s7/s7-1511-opc-request-all-types
+# source: https://raw.githubusercontent.com/ITI/ICS-Security-Tools/9b826091e7ba3fbdd5997d31e116f29e09cbbb48/pcaps/s7/S7-1511-opc-request-all-types.pcap
+# sha256: 19a7da2fa329aabf87cc0073bb487e5bbfe2ec4065f1e1ef5ffb25f75424dbe1
+# license: CC-BY-4.0
+# origin: ITI/ICS-Security-Tools (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	s7	1	C	6	0	030000322de00000002800c110534e4f50434330303032303030303031c21053494d415449432d524f4f542d4f5448c0010a	type=0x0e
+P	s7	-1	S	8	0	030000322dd00028000100c0010ac110534e4f50434330303032303030303031c21053494d415449432d524f4f542d4f5448	type=0x0d;expert.group=33554432

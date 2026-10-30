@@ -1,0 +1,28 @@
+# capture: zeek/modbus/fuzz-72
+# source: https://raw.githubusercontent.com/zeek/zeek/048d1918063c19ff47e42a02f6c674b9349024f1/testing/btest/Traces/modbus/fuzz-72.pcap
+# sha256: 9c10fe386ebd89f3bd96e2eb5b8c20f16d6c1a3c014752c3bcb42fbed9ae3ebb
+# license: BSD-3-Clause
+# origin: zeek/zeek (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	modbus	-1	S	3	0	000000000006011d00000000	-
+P	modbus	1	C	5	0	00000000000301a001	-
+P	modbus	1	S	6	0	00000000000401210000	-
+P	modbus	-1	S	16	0	000000000006012b00000000	-
+P	modbus	-1	S	17	0	000000000006012e00000011	-
+P	modbus	-1	S	18	0	000000000006012f00000000	-
+P	modbus	2	C	19	0	00000000000301af01	-
+P	modbus	2	S	20	0	000000000006013200000000	-
+P	modbus	3	C	21	0	00000000000301b301	-
+P	modbus	3	S	22	0	000000000006013400000000	-
+P	modbus	-1	S	23	0	00f300000006013500000000	-
+P	modbus	-1	S	24	0	000000000006013600000000	-
+P	modbus	4	C	25	0	00000000000301b601	-
+P	modbus	5	C	26	0	00000000000301ba01	-
+P	modbus	6	C	27	0	00000000000301bb01	-
+P	modbus	-1	S	28	0	002500000006014700000000	-
+P	modbus	6	S	29	0	000000000006013f00000000	-
+P	modbus	-1	S	31	0	000000000006014100000000	-
+P	modbus	7	C	32	0	00000000000301c201	-
+P	modbus	7	S	33	0	000000000006014700000000	-
+P	modbus	-1	S	36	0	00000000000601464e000000	-

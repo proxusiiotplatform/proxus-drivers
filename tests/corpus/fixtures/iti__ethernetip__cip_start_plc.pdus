@@ -1,0 +1,8 @@
+# capture: iti/ethernetip/cip_start_plc
+# source: https://raw.githubusercontent.com/ITI/ICS-Security-Tools/9b826091e7ba3fbdd5997d31e116f29e09cbbb48/pcaps/EthernetIP/cip_start_plc.pcap
+# sha256: 3b341bee9e7790bf0fae8468f55c9b90ac49e014cfb1dc3cc97437f811d0933f
+# license: CC-BY-4.0
+# origin: ITI/ICS-Security-Tools (original to the repository)
+# extracted-with: tools/golden_corpus/extract_corpus.py; TShark (Wireshark) 4.6.4 (v4.6.4-0-g93282876538d).
+# columns: P protocol pair dir frame stream hex wireshark-fields
+P	enip	1	C	1	0	70001c0001002a00000000000000000000000000000000000000000001000200a1000400224095ffb1000800e7000602208e2401	command=0x0070;length=28;session=0x002a0001;status=0x00000000;context=0000000000000000;cpf.itemcount=2;cpf.typeid=0x00a1,0x00b1;service=0x06;class=0x8e;instance=0x01;cpf.cai.connid=0xff954022;seq=231;expert.group=150994944

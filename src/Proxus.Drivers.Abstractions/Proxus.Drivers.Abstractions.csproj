@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ProxusNuGetPackage>true</ProxusNuGetPackage>
+        <Description>Shared contracts of the Proxus industrial drivers: results and structured errors without exceptions, values and quality, data types, record schemas and capabilities. Native AOT compatible.</Description>
+        <AssemblyName>Proxus.Drivers.Abstractions</AssemblyName>
+        <RootNamespace>Proxus.Drivers</RootNamespace>
+    </PropertyGroup>
+</Project>
