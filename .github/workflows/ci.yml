@@ -31,11 +31,14 @@ jobs:
           global-json-file: global.json
       - name: Build
         run: dotnet build Proxus.Drivers.slnx -c Release
+      # Each self-test suite runs even when an earlier one failed, so one run shows every failure.
       - name: Abstractions self-tests
         run: dotnet run --project tests/Proxus.Drivers.Abstractions.SelfTests -c Release --no-build
       - name: Modbus self-tests
+        if: success() || failure()
         run: dotnet run --project tests/Proxus.Drivers.Modbus.SelfTests -c Release --no-build
       - name: OPC UA self-tests
+        if: success() || failure()
         run: dotnet run --project tests/Proxus.Drivers.OpcUa.SelfTests -c Release --no-build
 
   packages:

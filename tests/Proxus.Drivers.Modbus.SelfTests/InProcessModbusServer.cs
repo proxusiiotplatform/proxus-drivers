@@ -209,6 +209,11 @@ public sealed class InProcessModbusServer : IAsyncDisposable
             {
                 return;
             }
+            catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested)
+            {
+                // On Windows a stopped listener can fail the pending accept this way instead of with a SocketException.
+                return;
+            }
 
             var id = Interlocked.Increment(ref _clientSequence);
             Interlocked.Increment(ref _connectionCount);
