@@ -8,7 +8,7 @@ async socket I/O and structured errors that say what failed, why, and what to tr
 | `Proxus.Drivers.Abstractions` | Protocol-neutral values, quality, timestamps, errors and the common driver contract |
 | `Proxus.Drivers.Core` | Socket and timeout plumbing shared by the drivers |
 | `Proxus.Drivers.Modbus` | Modbus master over TCP, with RTU and ASCII framing through a gateway or a stream you open |
-| `Proxus.Drivers.OpcUa` | OPC UA Binary client: SecureChannel (None, Basic256Sha256, Aes256_Sha256_RsaPss), Session, Read, Write, Browse, subscriptions, history, methods and events |
+| `Proxus.Drivers.OpcUa` | OPC UA Binary client: SecureChannel (None, Basic256Sha256, Aes128_Sha256_RsaOaep, Aes256_Sha256_RsaPss), Session, Read, Write, Browse, subscriptions, history, methods and events |
 
 None of the packages depends on another library.
 

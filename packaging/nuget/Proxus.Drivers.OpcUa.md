@@ -1,7 +1,7 @@
 # Proxus.Drivers.OpcUa
 
 A native OPC UA client for .NET 10, with no external OPC UA stack: secure channels (None, Basic256Sha256,
-Aes256_Sha256_RsaPss with Sign or SignAndEncrypt), anonymous, user name and certificate sessions that are activated
+Aes128_Sha256_RsaOaep, Aes256_Sha256_RsaPss with Sign or SignAndEncrypt), anonymous, user name and certificate sessions that are activated
 again after a lost channel, and Read, Write, Browse, subscriptions, events and alarms, history and method calls. Every
 call returns a result with a structured error instead of throwing; no reflection, Native AOT compatible.
 

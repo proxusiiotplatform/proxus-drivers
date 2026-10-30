@@ -18,7 +18,9 @@ each service separately.
 
 - `vendor-and-independently-verified` (asyncua 2.0.1 independent stack and the Prosys OPC UA
   Simulation Server vendor simulator): SecureChannel, Session, Read, Browse, subscriptions with
-  Publish, and `Aes256_Sha256_RsaPss` Sign and SignAndEncrypt.
+  Publish, and `Aes256_Sha256_RsaPss` Sign and SignAndEncrypt. `Aes128_Sha256_RsaOaep` Sign and
+  SignAndEncrypt with Anonymous login have the same two kinds of evidence (Prosys, and asyncua 1.1.8 through
+  the published proxus-mcp native client); UserName and X509 tokens were not exercised under it.
 - `independently-verified`: Write and UserName identity tokens (asyncua, plus open62541 v1.4.14 and the
   OPC Foundation UA-.NETStandard 1.5.378.176 reference server in the software-qualification lab);
   `Basic256Sha256` Sign and SignAndEncrypt (open62541 and the OPC Foundation reference server, no
@@ -35,12 +37,14 @@ each service separately.
 
 ## Security
 
-Select a policy with the constants in `OpcUaSecurityPolicyUris` (`None`, `Basic256Sha256`, `Aes256Sha256RsaPss`)
+Select a policy with the constants in `OpcUaSecurityPolicyUris` (`None`, `Basic256Sha256`, `Aes128Sha256RsaOaep`,
+`Aes256Sha256RsaPss`)
 rather than typing the URIs, both for `OpcUaTcpOptions.SecurityPolicyUri` and when matching the endpoints a server
 advertises.
 
-SecurityPolicy None and `Aes256_Sha256_RsaPss` with Sign or SignAndEncrypt have independent and
-vendor-simulator evidence. `Basic256Sha256` Sign and SignAndEncrypt are independently verified against
+SecurityPolicy None, `Aes256_Sha256_RsaPss` and `Aes128_Sha256_RsaOaep` with Sign or SignAndEncrypt have
+independent and vendor-simulator evidence. `Aes128_Sha256_RsaOaep` uses the `Basic256Sha256` RSA algorithms
+(PKCS#1 v1.5 SHA-256 signatures, RSA-OAEP with SHA-1) with a 16-byte AES-128-CBC key. `Basic256Sha256` Sign and SignAndEncrypt are independently verified against
 open62541 and the OPC Foundation reference server, with no vendor-simulator Session; the authenticated
 Session against Kepware Server 7 is blocked. Anonymous, UserName, and X509 identity tokens are
 available only under the documented endpoint and certificate-validation rules. An X509 user token is

@@ -2421,6 +2421,14 @@ SecurityPolicy URIs (OPC 10000-7) for `OpcUaTcpOptions.SecurityPolicyUri` and fo
 
 ### Members
 
+#### `Aes128Sha256RsaOaep`
+
+```csharp
+Aes128Sha256RsaOaep = http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep
+```
+
+Aes128_Sha256_RsaOaep: RSA PKCS#1 v1.5 SHA-256 signatures, RSA-OAEP (SHA-1), AES-128-CBC, HMAC-SHA256.
+
 #### `Aes256Sha256RsaPss`
 
 ```csharp

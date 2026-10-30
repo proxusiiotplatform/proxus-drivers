@@ -353,7 +353,7 @@ public sealed partial class OpcUaTcpClient
         if (OpcUaSecurityPolicies.TryResolve(uri, out var policy) && policy is not null)
             return policy;
         throw new NotSupportedException(
-            $"X509IdentityToken SecurityPolicyUri '{uri}' cannot sign the user token; Basic256Sha256 or Aes256_Sha256_RsaPss is required.");
+            $"X509IdentityToken SecurityPolicyUri '{uri}' cannot sign the user token; Basic256Sha256, Aes128_Sha256_RsaOaep or Aes256_Sha256_RsaPss is required.");
     }
 
     /// <summary>

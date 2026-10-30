@@ -6,6 +6,7 @@ internal static class OpcUaProtocol
     public const string SecurityPolicyNone = OpcUaSecurityPolicyUris.None;
     public const string SecurityPolicyAes256Sha256RsaPss = OpcUaSecurityPolicies.Aes256Sha256RsaPssUri;
     public const string SecurityPolicyBasic256Sha256 = OpcUaSecurityPolicies.Basic256Sha256Uri;
+    public const string SecurityPolicyAes128Sha256RsaOaep = OpcUaSecurityPolicies.Aes128Sha256RsaOaepUri;
     public const string RsaPssSha256SignatureAlgorithm = "http://opcfoundation.org/UA/security/rsa-pss-sha2-256";
     public const string RsaSha256SignatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
     public const string RsaOaepEncryptionAlgorithm = "http://www.w3.org/2001/04/xmlenc#rsa-oaep";

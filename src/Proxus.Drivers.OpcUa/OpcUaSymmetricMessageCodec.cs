@@ -58,7 +58,7 @@ internal static class OpcUaSymmetricMessageCodec
         CryptographicOperations.ZeroMemory(signature);
 
         var protectedBytes = mode == OpcUaMessageSecurityMode.SignAndEncrypt
-            ? OpcUaSecurityCrypto.EncryptAes256Cbc(keys.EncryptionKey, keys.InitializationVector, plain.WrittenSpan,
+            ? OpcUaSecurityCrypto.EncryptAesCbc(keys.EncryptionKey, keys.InitializationVector, plain.WrittenSpan,
                 policy)
             : [.. plain.WrittenSpan];
         try
@@ -98,7 +98,7 @@ internal static class OpcUaSymmetricMessageCodec
             throw new ArgumentOutOfRangeException(nameof(mode));
 
         var protectedBytes = mode == OpcUaMessageSecurityMode.SignAndEncrypt
-            ? OpcUaSecurityCrypto.DecryptAes256Cbc(keys.EncryptionKey, keys.InitializationVector, message[16..],
+            ? OpcUaSecurityCrypto.DecryptAesCbc(keys.EncryptionKey, keys.InitializationVector, message[16..],
                 policy)
             : [.. message[16..]];
         try

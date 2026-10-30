@@ -37,6 +37,7 @@ internal static class Program
         await Run("Subscription consumer cancellation and dispose", TestSubscriptionCancellationLifecycle);
         await Run("Aes256Sha256RsaPss policy profile", TestSecurityPolicyProfile);
         await Run("Basic256Sha256 crypto and message framing", TestBasic256Sha256);
+        await Run("Aes128Sha256RsaOaep crypto and message framing", TestAes128Sha256RsaOaep);
         await Run("P_SHA256 independent vector", TestPHashSha256Vector);
         await Run("OPC UA directional key derivation", TestDirectionalKeyDerivation);
         await Run("RSA-PSS signature and tamper rejection", TestRsaPss);
@@ -174,6 +175,71 @@ internal static class Program
         return Task.CompletedTask;
     }
 
+    private static Task TestAes128Sha256RsaOaep()
+    {
+        True(OpcUaSecurityPolicies.TryResolve(OpcUaSecurityPolicyUris.Aes128Sha256RsaOaep, out var resolved),
+            "Aes128Sha256RsaOaep resolves");
+        var policy = resolved!;
+        Equal(OpcUaProtocol.RsaSha256SignatureAlgorithm, policy.AsymmetricSignatureAlgorithmUri,
+            "Aes128Sha256RsaOaep signature algorithm");
+        Equal(OpcUaProtocol.RsaOaepEncryptionAlgorithm, policy.AsymmetricEncryptionAlgorithmUri,
+            "Aes128Sha256RsaOaep encryption algorithm");
+        Equal(16, policy.SymmetricEncryptionKeyLength, "Aes128Sha256RsaOaep AES-128 key length");
+        Equal(32, policy.SymmetricSignatureKeyLength, "Aes128Sha256RsaOaep HMAC-SHA256 key length");
+
+        // NIST SP 800-38A F.2.1 CBC-AES128.Encrypt, first two blocks.
+        var key = Convert.FromHexString("2B7E151628AED2A6ABF7158809CF4F3C");
+        var iv = Convert.FromHexString("000102030405060708090A0B0C0D0E0F");
+        var block = Convert.FromHexString("6BC1BEE22E409F96E93D7E117393172AAE2D8A571E03AC9C9EB76FAC45AF8E51");
+        var expected = Convert.FromHexString("7649ABAC8119B246CEE98E9B12E9197D5086CB9B507219EE95DB113A917678B2");
+        True(OpcUaSecurityCrypto.EncryptAesCbc(key, iv, block, policy).AsSpan().SequenceEqual(expected),
+            "AES-128-CBC matches the NIST SP 800-38A vector");
+        True(OpcUaSecurityCrypto.DecryptAesCbc(key, iv, expected, policy).AsSpan().SequenceEqual(block),
+            "AES-128-CBC NIST vector decrypts");
+        Throws<CryptographicException>(() => OpcUaSecurityCrypto.EncryptAesCbc(new byte[32], iv, block, policy),
+            "a 32-byte AES key is rejected for Aes128Sha256RsaOaep");
+
+        var clientNonce = Enumerable.Range(0, 32).Select(static value => (byte)value).ToArray();
+        var serverNonce = Enumerable.Range(32, 32).Select(static value => (byte)value).ToArray();
+        var (clientKeys, serverKeys) = OpcUaSecurityCrypto.DeriveKeys(clientNonce, serverNonce, policy);
+        using (clientKeys)
+        using (serverKeys)
+        {
+            // P_SHA256 is a stream, so the 64 bytes this policy needs are a prefix of the 80-byte vector the
+            // directional key derivation test checks: 32-byte signing key, 16-byte AES key, 16-byte IV.
+            var clientExpected =
+                Convert.FromHexString(
+                    "DD585DB0C102DD1A4C1ED4DD195606DEC3F7A1C789AFCA78F9479ED3A5D668AFCE49CB8F1C65A827F412C48E71C9F9CB3B5C2EE2FC2E4B3BD46D4098B5E45475");
+            True(JoinKeySet(clientKeys).AsSpan().SequenceEqual(clientExpected),
+                "Aes128Sha256RsaOaep key split: 32-byte signing key, 16-byte AES key, 16-byte IV");
+
+            var payload = Enumerable.Range(0, 700).Select(static value => (byte)(value * 31)).ToArray();
+            foreach (var mode in new[] { OpcUaMessageSecurityMode.Sign, OpcUaMessageSecurityMode.SignAndEncrypt })
+            {
+                var message = OpcUaSymmetricMessageCodec.Encode("MSGF"u8, 5, 7, 11, 13, payload, mode, clientKeys,
+                    policy);
+                var decoded = OpcUaSymmetricMessageCodec.DecodeToUnsecuredEnvelope(message, mode, clientKeys, policy);
+                True(decoded.AsSpan(24).SequenceEqual(payload), $"Aes128Sha256RsaOaep {mode} symmetric round-trip");
+                message[^1] ^= 1;
+                Throws<CryptographicException>(
+                    () => OpcUaSymmetricMessageCodec.DecodeToUnsecuredEnvelope(message, mode, clientKeys, policy),
+                    $"Aes128Sha256RsaOaep {mode} tamper rejection");
+            }
+
+            using var clientCertificate =
+                CreateApplicationCertificate("client.aes128.test", "urn:proxus:test:aes128-client", true);
+            using var serverCertificate =
+                CreateApplicationCertificate("server.aes128.test", "urn:proxus:test:aes128-server", false);
+            var open = OpcUaAsymmetricOpenCodec.Encode(0, 17, 23, payload, clientCertificate, serverCertificate,
+                policy);
+            var decodedOpen = OpcUaAsymmetricOpenCodec.Decode(open, serverCertificate, clientCertificate, policy);
+            True(decodedOpen.Body.AsSpan().SequenceEqual(payload), "Aes128Sha256RsaOaep OPN round-trip");
+            Equal(policy.Uri, decodedOpen.SecurityPolicyUri, "Aes128Sha256RsaOaep OPN policy");
+        }
+
+        return Task.CompletedTask;
+    }
+
     private static Task TestPHashSha256Vector()
     {
         var secret = Enumerable.Range(0, 32).Select(static value => (byte)value).ToArray();
@@ -245,13 +311,13 @@ internal static class Program
         plaintext[0] ^= 1;
         True(!OpcUaSecurityCrypto.VerifyHmacSha256(key, plaintext, mac), "tampered HMAC rejected");
         plaintext[0] ^= 1;
-        var ciphertext = OpcUaSecurityCrypto.EncryptAes256Cbc(key, iv, plaintext,
+        var ciphertext = OpcUaSecurityCrypto.EncryptAesCbc(key, iv, plaintext,
             OpcUaSecurityPolicies.Aes256Sha256RsaPss);
         True(!ciphertext.AsSpan().SequenceEqual(plaintext), "ciphertext differs");
-        var decrypted = OpcUaSecurityCrypto.DecryptAes256Cbc(key, iv, ciphertext,
+        var decrypted = OpcUaSecurityCrypto.DecryptAesCbc(key, iv, ciphertext,
             OpcUaSecurityPolicies.Aes256Sha256RsaPss);
         True(decrypted.AsSpan().SequenceEqual(plaintext), "AES-256-CBC round-trip");
-        Throws<CryptographicException>(() => OpcUaSecurityCrypto.EncryptAes256Cbc(key, iv, plaintext.AsSpan(1),
+        Throws<CryptographicException>(() => OpcUaSecurityCrypto.EncryptAesCbc(key, iv, plaintext.AsSpan(1),
             OpcUaSecurityPolicies.Aes256Sha256RsaPss),
             "partial AES block rejected");
         return Task.CompletedTask;
@@ -536,7 +602,7 @@ internal static class Program
         signed.WriteBytes(plain.WrittenSpan);
         var signature = OpcUaSecurityCrypto.ComputeHmacSha256(keys.SigningKey, signed.WrittenSpan);
         plain.WriteBytes(signature);
-        var encrypted = OpcUaSecurityCrypto.EncryptAes256Cbc(keys.EncryptionKey, keys.InitializationVector,
+        var encrypted = OpcUaSecurityCrypto.EncryptAesCbc(keys.EncryptionKey, keys.InitializationVector,
             plain.WrittenSpan,
             OpcUaSecurityPolicies.Aes256Sha256RsaPss);
         return [.. signed.WrittenSpan[..16], .. encrypted];
@@ -659,7 +725,7 @@ internal static class Program
 
         try
         {
-            OpcUaSecurityCrypto.EncryptAes256Cbc(new byte[16], new byte[16], new byte[16],
+            OpcUaSecurityCrypto.EncryptAesCbc(new byte[16], new byte[16], new byte[16],
                 OpcUaSecurityPolicies.Basic256Sha256);
             throw new InvalidOperationException("short AES key accepted");
         }

@@ -175,24 +175,22 @@ internal static class OpcUaSecurityCrypto
         return valid;
     }
 
-    internal static byte[] EncryptAes256Cbc(ReadOnlySpan<byte> key, ReadOnlySpan<byte> initializationVector,
+    internal static byte[] EncryptAesCbc(ReadOnlySpan<byte> key, ReadOnlySpan<byte> initializationVector,
         ReadOnlySpan<byte> plaintext, OpcUaSecurityPolicyProfile policy)
     {
         ValidateAesInputs(key, initializationVector, plaintext, policy);
         using var aes = Aes.Create();
-        aes.KeySize = 256;
         aes.Key = [.. key];
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.None;
         return aes.EncryptCbc(plaintext, initializationVector, PaddingMode.None);
     }
 
-    internal static byte[] DecryptAes256Cbc(ReadOnlySpan<byte> key, ReadOnlySpan<byte> initializationVector,
+    internal static byte[] DecryptAesCbc(ReadOnlySpan<byte> key, ReadOnlySpan<byte> initializationVector,
         ReadOnlySpan<byte> ciphertext, OpcUaSecurityPolicyProfile policy)
     {
         ValidateAesInputs(key, initializationVector, ciphertext, policy);
         using var aes = Aes.Create();
-        aes.KeySize = 256;
         aes.Key = [.. key];
         aes.Mode = CipherMode.CBC;
         aes.Padding = PaddingMode.None;
