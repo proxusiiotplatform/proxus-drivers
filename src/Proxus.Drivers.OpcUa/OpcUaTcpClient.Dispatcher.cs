@@ -112,7 +112,8 @@ public sealed partial class OpcUaTcpClient
         DriverOperation operation,
         TimeSpan timeout,
         CancellationToken cancellationToken,
-        bool expectsOpenSecureChannel = false)
+        bool expectsOpenSecureChannel = false,
+        Func<UaBinaryWriter, DriverError?>? prepare = null)
     {
         var pending = new PendingServiceRequest(expectsOpenSecureChannel, operation, timeout);
         if (!_pendingRequests.TryAdd(requestId, pending))
@@ -126,6 +127,13 @@ public sealed partial class OpcUaTcpClient
             await _sendGate.WaitAsync(sendGateTimeout.Token).ConfigureAwait(false);
             try
             {
+                // Numbering and protection happen here, inside the gate, so SequenceNumbers leave in order.
+                if (prepare?.Invoke(writer) is { } prepareError)
+                {
+                    AbandonPending(requestId, pending);
+                    return DriverResult<byte[]>.Failure(prepareError);
+                }
+
                 using var sendTimeout = TimeoutTokenScope.Create(cancellationToken, timeout);
                 await SocketIo.SendAllAsync(socket, writer.WrittenMemory, sendTimeout.Token).ConfigureAwait(false);
             }

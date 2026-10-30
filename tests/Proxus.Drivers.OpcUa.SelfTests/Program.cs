@@ -26,6 +26,7 @@ internal static class Program
         await Run("Transport ERR maps structured error", TestTransportError);
         await Run("Invalid ACK buffer rejected", TestInvalidAck);
         await Run("Subscription services and concurrent Publish dispatch", TestSubscriptionServices);
+        await Run("Concurrent requests get distinct RequestIds and ordered SequenceNumbers", TestConcurrentRequestOrdering);
         await Run("Pending service timeout closes socket", TestPendingServiceTimeout);
         await Run("Idle dispatcher does not expire connection", TestIdleDispatcher);
         await Run("Subscription duplicate gap and wrap matrix", TestSubscriptionSequenceMatrix);
@@ -1001,6 +1002,42 @@ internal static class Program
         True(deletedSubscriptions.IsSuccess && deletedSubscriptions.Value[0] == 0, "delete subscription");
         await Task.Delay(1_250);
         Equal(201u, client.SecureChannel!.Value.TokenId, "automatic secure channel renewal");
+    }
+
+    // Fifty Reads started at once on one connection must all succeed, and the server must see SequenceNumbers rise
+    // in the order the messages arrive. Before the fix, RequestIds collided ("already pending") and SequenceNumbers
+    // were assigned before the send gate, so they could reach the server out of order and the channel closed.
+    private static async Task TestConcurrentRequestOrdering()
+    {
+        await using var server = new SubscriptionServiceServer();
+        await server.StartAsync();
+        await using var client = CreateClient(server.Port);
+        var connected = await client.ConnectAsync();
+        True(connected.IsSuccess, connected.IsSuccess ? "connect" : connected.Error.ToUserMessage());
+        typeof(OpcUaTcpClient).GetProperty(nameof(OpcUaTcpClient.Session))!.SetValue(client,
+            new OpcUaSessionInfo(IndustrialNodeId.Numeric(0, 9001), IndustrialNodeId.Numeric(0, 9002), 60_000, 65_536,
+                "anonymous", true));
+        while (server.Requests.TryDequeue(out _))
+        {
+        }
+
+        var start = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var reads = Enumerable.Range(0, 50).Select(_ => Task.Run(async () =>
+        {
+            await start.Task;
+            return await client.ReadAsync(new OpcUaNodeDescriptor(IndustrialNodeId.Numeric(2, 7001)));
+        })).ToArray();
+        start.SetResult();
+        var results = await Task.WhenAll(reads);
+
+        var failed = results.Where(static r => !r.IsSuccess).Select(static r => r.Error.Code).ToArray();
+        True(failed.Length == 0, $"concurrent reads failed: {string.Join(", ", failed.Distinct())}");
+        True(results.All(static r => r.Value.Value.AsFloat64() == 12.5), "every concurrent read returned the value");
+        var sequences = server.Requests.Select(static r => r.SequenceNumber).ToArray();
+        Equal(50, sequences.Length, "requests seen by the server");
+        for (var i = 1; i < sequences.Length; i++)
+            True(sequences[i] == sequences[i - 1] + 1,
+                $"SequenceNumbers out of order at arrival {i}: {sequences[i - 1]} then {sequences[i]}");
     }
 
     private static async Task TestPendingServiceTimeout()

@@ -63,6 +63,9 @@ by the recorded open62541 and python-opcua responses and the fuzz reproducers in
 
 ## Reconnect and Session lifetime
 
+One `OpcUaTcpClient` accepts concurrent calls: Reads, Writes, Browse and Publish can be issued at the same time
+and are pipelined on the SecureChannel, each answered by its own RequestId.
+
 A lost SecureChannel (timeout, reset, network loss) no longer orphans the Session: the next `Open*SessionAsync` on a
 new channel activates the same Session again (OPC 10000-4 5.6.3, `ReactivateSessionOnReconnect`, default true) and
 reports `SessionReactivated`; this includes a Session whose ActivateSession response was lost. A server that no

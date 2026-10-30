@@ -253,24 +253,12 @@ public sealed partial class OpcUaTcpClient
                 session.AuthenticationToken, requestId, requestHandle);
             writer.WriteBytes(parameters.WrittenSpan);
             CryptographicOperations.ZeroMemory(MemoryMarshal.AsMemory(parameters.WrittenMemory).Span);
-            try
-            {
-                FinalizeServiceMessage(writer);
-            }
-            catch (Exception ex) when (ex is CryptographicException or InvalidOperationException)
-            {
-                CloseSocket();
-                return Failure(DriverErrorKind.Protocol, "UA_ACTIVATE_SESSION_ENCODE", ex.Message,
-                    DriverOperation.Handshake, DriverRetryDisposition.ReconnectAndRetry,
-                    DriverConnectionDisposition.Broken);
-            }
             DriverResult<OpcUaServiceEnvelope> envelope;
             _activationInFlight = true;
             try
             {
                 envelope = await SendServiceAsync(_socket, writer, requestId, requestHandle,
-                        OpcUaProtocol.ActivateSessionResponseBinary, DriverOperation.Handshake, cancellationToken,
-                        finalize: false)
+                        OpcUaProtocol.ActivateSessionResponseBinary, DriverOperation.Handshake, cancellationToken)
                     .ConfigureAwait(false);
             }
             finally
@@ -521,15 +509,25 @@ public sealed partial class OpcUaTcpClient
         writer.WriteUInt32(0);
         writer.WriteUInt32(channel.Value.ChannelId);
         writer.WriteUInt32(channel.Value.TokenId);
-        writer.WriteUInt32(NextSequenceNumber());
+        writer.WriteUInt32(0); // SequenceNumber, assigned under the send gate below
         writer.WriteUInt32(requestId);
         writer.WriteNodeId(IndustrialNodeId.Numeric(0, OpcUaProtocol.CloseSecureChannelRequestBinary));
         WriteRequestHeader(writer, IndustrialNodeId.Numeric(0, 0), requestHandle, _options.RequestTimeout);
-        FinalizeServiceMessage(writer);
         try
         {
             using var timeout = TimeoutTokenScope.Create(cancellationToken, _options.RequestTimeout);
-            await SocketIo.SendAllAsync(socket, writer.WrittenMemory, timeout.Token).ConfigureAwait(false);
+            await _sendGate.WaitAsync(timeout.Token).ConfigureAwait(false);
+            try
+            {
+                writer.PatchUInt32(16, NextSequenceNumber());
+                FinalizeServiceMessage(writer);
+                await SocketIo.SendAllAsync(socket, writer.WrittenMemory, timeout.Token).ConfigureAwait(false);
+            }
+            finally
+            {
+                _sendGate.Release();
+            }
+
             return DriverResult.Success();
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -690,7 +688,9 @@ public sealed partial class OpcUaTcpClient
         writer.WriteUInt32(0);
         writer.WriteUInt32(channel?.ChannelId ?? 0);
         writer.WriteUInt32(channel?.TokenId ?? 0);
-        writer.WriteUInt32(NextSequenceNumber());
+        // SequenceNumber placeholder: SendServiceAsync assigns it under the send gate, so numbers reach the wire in
+        // order even when several requests are built at once (OPC 10000-6 6.7.2.4).
+        writer.WriteUInt32(0);
         writer.WriteUInt32(requestId);
         writer.WriteNodeId(IndustrialNodeId.Numeric(0, typeId));
         WriteRequestHeader(writer, authToken, requestHandle, requestTimeout ?? _options.RequestTimeout);
@@ -725,31 +725,38 @@ public sealed partial class OpcUaTcpClient
     }
 
     /// <summary>
-    ///     Protects (unless the caller already did) and sends a request built by
-    ///     <see cref="BeginServiceRequest" />. The socket and channel are re-checked here, because the
-    ///     receive loop can close them at any time; a lost channel is reported as UA_CHANNEL_LOST.
+    ///     Numbers, protects and sends a request built by <see cref="BeginServiceRequest" />. The SequenceNumber is
+    ///     assigned and the message signed or encrypted under the send gate, so concurrent requests reach the server
+    ///     with increasing SequenceNumbers. The socket and channel are re-checked here, because the receive loop can
+    ///     close them at any time; a lost channel is reported as UA_CHANNEL_LOST.
     /// </summary>
     private async ValueTask<DriverResult<OpcUaServiceEnvelope>> SendServiceAsync(Socket? socket, UaBinaryWriter writer,
         uint requestId, uint requestHandle, uint expectedTypeId, DriverOperation operation,
-        CancellationToken cancellationToken, TimeSpan? responseTimeout = null, bool finalize = true)
+        CancellationToken cancellationToken, TimeSpan? responseTimeout = null)
     {
         var expectedChannelId = BinaryPrimitives.ReadUInt32LittleEndian(writer.WrittenSpan.Slice(8, 4));
         var expectedTokenId = BinaryPrimitives.ReadUInt32LittleEndian(writer.WrittenSpan.Slice(12, 4));
         if (socket is null || !ReferenceEquals(socket, _socket) || SecureChannel is not { } channel ||
             expectedChannelId == 0 || channel.ChannelId != expectedChannelId)
             return DriverResult<OpcUaServiceEnvelope>.Failure(ChannelLost(operation));
-        if (finalize)
+
+        DriverError? NumberAndProtect(UaBinaryWriter message)
+        {
+            message.PatchUInt32(16, NextSequenceNumber());
             try
             {
-                FinalizeServiceMessage(writer);
+                FinalizeServiceMessage(message);
+                return null;
             }
-            catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException)
+            catch (Exception ex) when (ex is InvalidOperationException or ObjectDisposedException or CryptographicException)
             {
                 // The symmetric keys were released by a concurrent channel close.
-                return DriverResult<OpcUaServiceEnvelope>.Failure(ChannelLost(operation));
+                return ChannelLost(operation);
             }
+        }
+
         var dispatched = await SendAndAwaitResponseAsync(socket, writer, requestId, operation,
-            responseTimeout ?? _options.RequestTimeout, cancellationToken).ConfigureAwait(false);
+            responseTimeout ?? _options.RequestTimeout, cancellationToken, prepare: NumberAndProtect).ConfigureAwait(false);
         if (!dispatched.IsSuccess) return DriverResult<OpcUaServiceEnvelope>.Failure(dispatched.Error);
         try
         {

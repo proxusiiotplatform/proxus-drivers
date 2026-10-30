@@ -235,7 +235,6 @@ public sealed partial class OpcUaTcpClient : IAsyncDisposable, IOpcUaSubscriptio
     private async ValueTask<DriverResult> RequestSecureChannelAsync(Socket socket,
         OpcUaSecurityTokenRequestType requestType, CancellationToken cancellationToken)
     {
-        var sequence = NextSequenceNumber();
         var requestId = NextRequestId();
         var requestHandle = requestId;
 
@@ -259,49 +258,61 @@ public sealed partial class OpcUaTcpClient : IAsyncDisposable, IOpcUaSubscriptio
 
         body.WriteUInt32(_options.RequestedSecureChannelLifetimeMilliseconds);
 
-        using var writer = new UaBinaryWriter(body.Position + 2048);
-        if (_options.SecurityMode == OpcUaMessageSecurityMode.None)
+        // Built with its SequenceNumber at send time: a renewal can run while other requests are in flight, and the
+        // server requires SequenceNumbers to increase in the order messages arrive.
+        void Build(UaBinaryWriter writer, uint sequence)
         {
-            writer.WriteBytes("OPNF"u8);
-            writer.WriteUInt32(0);
-            writer.WriteUInt32(requestType == OpcUaSecurityTokenRequestType.Issue
-                ? 0u
-                : SecureChannel?.ChannelId ?? 0u);
-            writer.WriteString(OpcUaProtocol.SecurityPolicyNone);
-            writer.WriteNullByteString();
-            writer.WriteNullByteString();
-            writer.WriteUInt32(sequence);
-            writer.WriteUInt32(requestId);
-            writer.WriteBytes(body.WrittenSpan);
-            writer.PatchUInt32(4, checked((uint)writer.Position));
-        }
-        else
-        {
-            var clientCertificate = _options.ApplicationIdentity!.Certificate;
-            var serverCertificate = _options.GetEndpointServerCertificate()
-                                    ?? throw new InvalidOperationException("Endpoint server certificate is missing.");
-            var protectedMessage = OpcUaAsymmetricOpenCodec.Encode(
-                requestType == OpcUaSecurityTokenRequestType.Issue ? 0u : SecureChannel?.ChannelId ?? 0u,
-                sequence,
-                requestId,
-                body.WrittenSpan,
-                clientCertificate,
-                serverCertificate,
-                GetSecurityPolicy());
-            writer.WriteBytes(protectedMessage);
-            CryptographicOperations.ZeroMemory(protectedMessage);
+            if (_options.SecurityMode == OpcUaMessageSecurityMode.None)
+            {
+                writer.WriteBytes("OPNF"u8);
+                writer.WriteUInt32(0);
+                writer.WriteUInt32(requestType == OpcUaSecurityTokenRequestType.Issue
+                    ? 0u
+                    : SecureChannel?.ChannelId ?? 0u);
+                writer.WriteString(OpcUaProtocol.SecurityPolicyNone);
+                writer.WriteNullByteString();
+                writer.WriteNullByteString();
+                writer.WriteUInt32(sequence);
+                writer.WriteUInt32(requestId);
+                writer.WriteBytes(body.WrittenSpan);
+                writer.PatchUInt32(4, checked((uint)writer.Position));
+            }
+            else
+            {
+                var clientCertificate = _options.ApplicationIdentity!.Certificate;
+                var serverCertificate = _options.GetEndpointServerCertificate()
+                                        ?? throw new InvalidOperationException("Endpoint server certificate is missing.");
+                var protectedMessage = OpcUaAsymmetricOpenCodec.Encode(
+                    requestType == OpcUaSecurityTokenRequestType.Issue ? 0u : SecureChannel?.ChannelId ?? 0u,
+                    sequence,
+                    requestId,
+                    body.WrittenSpan,
+                    clientCertificate,
+                    serverCertificate,
+                    GetSecurityPolicy());
+                writer.WriteBytes(protectedMessage);
+                CryptographicOperations.ZeroMemory(protectedMessage);
+            }
         }
 
+        using var writer = new UaBinaryWriter(body.Position + 2048);
         byte[] message;
         if (_receiveLoopCancellation is not null && _receiveLoop is { IsCompleted: false })
         {
             var dispatched = await SendAndAwaitResponseAsync(socket, writer, requestId, DriverOperation.Negotiate,
-                _options.RequestTimeout, cancellationToken, true).ConfigureAwait(false);
+                _options.RequestTimeout, cancellationToken, true,
+                message =>
+                {
+                    Build(message, NextSequenceNumber());
+                    return null;
+                }).ConfigureAwait(false);
             if (!dispatched.IsSuccess) return DriverResult.Failure(dispatched.Error);
             message = dispatched.Value;
         }
         else
         {
+            // No receive loop yet: this is the first OpenSecureChannel and nothing else is being sent.
+            Build(writer, NextSequenceNumber());
             using (var timeout = TimeoutTokenScope.Create(cancellationToken, _options.RequestTimeout))
             {
                 await SocketIo.SendAllAsync(socket, writer.WrittenMemory, timeout.Token).ConfigureAwait(false);
@@ -652,15 +663,16 @@ public sealed partial class OpcUaTcpClient : IAsyncDisposable, IOpcUaSubscriptio
 
     private uint NextSequenceNumber()
     {
-        var next = unchecked(++_sequenceNumber);
-        if (next == 0) next = ++_sequenceNumber;
+        var next = Interlocked.Increment(ref _sequenceNumber);
+        if (next == 0) next = Interlocked.Increment(ref _sequenceNumber);
         return next;
     }
 
     private uint NextRequestId()
     {
-        var next = unchecked(++_requestId);
-        if (next == 0) next = ++_requestId;
+        // Concurrent callers each need their own RequestId: the dispatcher routes responses by it.
+        var next = Interlocked.Increment(ref _requestId);
+        if (next == 0) next = Interlocked.Increment(ref _requestId);
         return next;
     }
 
