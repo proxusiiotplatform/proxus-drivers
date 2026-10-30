@@ -17,6 +17,7 @@
         <NeutralLanguage>en</NeutralLanguage>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
         <PackageTags Condition="'$(PackageTags)' == ''">proxus;industrial;iiot;driver;native-aot</PackageTags>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -42,10 +43,12 @@
         <EmbedUntrackedSources>false</EmbedUntrackedSources>
         <RepositoryUrl>https://github.com/proxusiiotplatform/proxus-drivers</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://proxus.io/?utm_source=nuget&amp;utm_medium=package&amp;utm_campaign=proxus-drivers</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(ProxusNuGetPackage)' == 'true'">
         <None Include="$(MSBuildThisFileDirectory)packaging/nuget/$(PackageId).md" Pack="true" PackagePath="/README.md" Visible="false"/>
+        <None Include="$(MSBuildThisFileDirectory)packaging/nuget/icon.png" Pack="true" PackagePath="/" Visible="false"/>
     </ItemGroup>
 
     <!-- The packages ship as one set: each depends on its siblings at exactly its own version ([x.y.z]). -->

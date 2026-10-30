@@ -7,7 +7,7 @@ Usage: check_packages.py <directory> <version> [--open]
 repository and the commit, and the PDB must carry Source Link to it. Everything else is the same.
 
 For every expected package id the directory must hold <id>.<version>.nupkg and <id>.<version>.snupkg, and:
-- the .nupkg holds exactly the assembly, its XML documentation, README.md and NuGet's own files;
+- the .nupkg holds exactly the assembly, its XML documentation, README.md, icon.png and NuGet's own files;
 - the .snupkg holds exactly the portable PDB;
 - the nuspec declares the Apache-2.0 licence expression without licence acceptance (ADR 0043), a readme and a
   description, publishes no repository,
@@ -73,7 +73,7 @@ def check(directory: Path, version: str, open_repository: bool = False) -> list[
             continue
         with zipfile.ZipFile(nupkg) as z:
             names = [n for n in z.namelist() if not n.startswith("package/services/metadata/")]
-            allowed = {f"{package}.nuspec", "README.md", f"lib/net10.0/{package}.dll",
+            allowed = {f"{package}.nuspec", "README.md", "icon.png", f"lib/net10.0/{package}.dll",
                        f"lib/net10.0/{package}.xml", *NUGET_FILES}
             for name in names:
                 if name not in allowed:
@@ -105,6 +105,8 @@ def check(directory: Path, version: str, open_repository: bool = False) -> list[
                 commit = repository.get("commit", "") if repository is not None else ""
                 if repository is None or repository.get("url") != OPEN_REPOSITORY or len(commit) != 40:
                     fail(errors, f"{nupkg.name}: must name {OPEN_REPOSITORY} and the commit it was built from")
+                if not text("projectUrl").startswith("https://proxus.io/"):
+                    fail(errors, f"{nupkg.name}: the project URL must point at https://proxus.io/")
             elif repository is not None or text("projectUrl"):
                 fail(errors, f"{nupkg.name}: publishes a repository or project URL")
             dependencies = {d.get("id"): d.get("version") for d in metadata.iter(f"{{{ns['n']}}}dependency")}

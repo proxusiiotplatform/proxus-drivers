@@ -42,8 +42,10 @@ dotnet run --project tests/Proxus.Drivers.OpcUa.SelfTests -c Release --no-build
 
 ## More protocols
 
-These drivers are the open part of the driver set inside [Proxus](https://proxus.io/), an on-premise industrial
-data platform. Siemens S7, EtherNet/IP, CNC controls and the other protocols ship with the platform.
+These drivers are the open part of the driver set inside
+[Proxus](https://proxus.io/?utm_source=github&utm_medium=readme&utm_campaign=proxus-drivers), the on-premise industrial
+data platform: device connectivity, a Unified Namespace, historian, dashboards and governed AI access in one product.
+Siemens S7, EtherNet/IP, CNC controls and the other protocols ship with the platform.
 
 ## Licence
 

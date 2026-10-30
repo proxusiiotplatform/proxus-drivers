@@ -22,3 +22,10 @@ await client.DisconnectAsync();
 
 The package depends on `Proxus.Drivers.Abstractions` and `Proxus.Drivers.Core` at exactly the same version. Open
 source under the Apache License 2.0.
+
+## About Proxus
+
+Built by [Proxus](https://proxus.io/?utm_source=nuget&utm_medium=readme&utm_campaign=proxus-drivers), the on-premise
+industrial data platform: device connectivity, a Unified Namespace, historian, dashboards and governed AI access in one
+product. Siemens S7, EtherNet/IP, CNC controls and the other protocols ship with the platform.
+Source: [github.com/proxusiiotplatform/proxus-drivers](https://github.com/proxusiiotplatform/proxus-drivers).
