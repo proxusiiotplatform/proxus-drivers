@@ -1634,7 +1634,9 @@ static async Task RefusedConnectionDispositionAsync()
     var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
     listener.Stop();
 
-    await using var client = CreateClient(port);
+    // Windows retries the SYN to a closed port for about two seconds before it reports the refusal; Linux and macOS
+    // refuse at once. A longer connect timeout lets every platform reach the refusal this test is about.
+    await using var client = CreateClient(port, connectTimeout: TimeSpan.FromSeconds(10));
     var connect = await client.ConnectAsync().ConfigureAwait(false);
     AssertTransportContext(connect.Error, "MODBUS_CONNECT", DriverOperation.Connect);
 
@@ -1975,7 +1977,7 @@ static void RoundTrip(ModbusRegisterDescriptor descriptor, DriverValue value)
     MiniAssert.Equal(value.ToInvariantString(), decoded.Value.ToInvariantString());
 }
 
-static ModbusTcpClient CreateClient(int port, TimeSpan? requestTimeout = null)
+static ModbusTcpClient CreateClient(int port, TimeSpan? requestTimeout = null, TimeSpan? connectTimeout = null)
 {
     return new ModbusTcpClient(new ModbusTcpOptions
     {
@@ -1984,7 +1986,7 @@ static ModbusTcpClient CreateClient(int port, TimeSpan? requestTimeout = null)
         UnitId = 1,
         Framing = InProcessModbusServer.DefaultRtuFraming ? ModbusFraming.Rtu
             : InProcessModbusServer.DefaultAsciiFraming ? ModbusFraming.Ascii : ModbusFraming.Mbap,
-        ConnectTimeout = TimeSpan.FromSeconds(2),
+        ConnectTimeout = connectTimeout ?? TimeSpan.FromSeconds(2),
         RequestTimeout = requestTimeout ?? TimeSpan.FromSeconds(2)
     });
 }
