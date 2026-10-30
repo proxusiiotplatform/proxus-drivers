@@ -30,6 +30,20 @@
         <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=/_/</PathMap>
     </PropertyGroup>
 
+    <!--
+        Built in the public proxus-drivers repository (ADR 0044, -p:ProxusOpenRepository=true): the packages name that
+        repository and its commit, and Source Link points the debugger at its sources. Builds here never set it.
+    -->
+    <PropertyGroup Condition="'$(ProxusNuGetPackage)' == 'true' and '$(ProxusOpenRepository)' == 'true'">
+        <EnableSourceLink>true</EnableSourceLink>
+        <EnableSourceControlManagerQueries>true</EnableSourceControlManagerQueries>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <!-- Source Link would embed the SDK's generated files (AssemblyInfo, global usings); the PDB stays source-free. -->
+        <EmbedUntrackedSources>false</EmbedUntrackedSources>
+        <RepositoryUrl>https://github.com/proxusiiotplatform/proxus-drivers</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
     <ItemGroup Condition="'$(ProxusNuGetPackage)' == 'true'">
         <None Include="$(MSBuildThisFileDirectory)packaging/nuget/$(PackageId).md" Pack="true" PackagePath="/README.md" Visible="false"/>
     </ItemGroup>

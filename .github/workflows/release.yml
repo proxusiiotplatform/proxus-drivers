@@ -1,0 +1,138 @@
+# Publishes Proxus.Drivers.Abstractions, Core, Modbus and OpcUa to nuget.org for a version tag such as v0.1.0 or
+# v0.1.0-preview.1 on a commit of main. Order: build and self-tests, then pack and check the packages (with Source
+# Link to this repository), then push them from the protected "nuget" environment with a short-lived key from
+# nuget.org Trusted Publishing. No API key is stored anywhere.
+name: release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  pack:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Version from the tag, on main only
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if [[ ! "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Tag $TAG is not v<major>.<minor>.<patch>[-pre-release]."
+            exit 1
+          fi
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Tag $TAG is not on main; release only reviewed commits."
+            exit 1
+          fi
+          {
+            echo "version=${TAG#v}"
+            echo "assembly=${BASH_REMATCH[1]}.0.0.0"
+            echo "file=${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}.0"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Refuse a modified licence text
+        run: |
+          if ! echo "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4  LICENSE" | sha256sum --check --status; then
+            echo "::error::LICENSE is not the unmodified Apache-2.0 text from apache.org."
+            exit 1
+          fi
+
+      - name: Build and self-tests
+        run: |
+          dotnet build Proxus.Drivers.slnx -c Release
+          for suite in Abstractions Modbus OpcUa; do
+            dotnet run --project "tests/Proxus.Drivers.$suite.SelfTests" -c Release --no-build
+          done
+
+      - name: Pack
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          ASSEMBLY_VERSION: ${{ steps.version.outputs.assembly }}
+          FILE_VERSION: ${{ steps.version.outputs.file }}
+        run: |
+          for package in Abstractions Core Modbus OpcUa; do
+            dotnet pack "src/Proxus.Drivers.$package/Proxus.Drivers.$package.csproj" -c Release -o artifacts/nuget \
+              -p:Version="$VERSION" -p:AssemblyVersion="$ASSEMBLY_VERSION" -p:FileVersion="$FILE_VERSION" \
+              -p:ContinuousIntegrationBuild=true -p:ProxusOpenRepository=true
+          done
+
+      - name: Check the packages
+        run: python3 tools/check_packages.py artifacts/nuget "${{ steps.version.outputs.version }}" --open
+
+      - name: Checksums
+        working-directory: artifacts/nuget
+        run: sha256sum -- *.nupkg *.snupkg | tee SHA256SUMS
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: nuget-packages
+          path: artifacts/nuget/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: pack
+    # Only a tag the repository owner pushed publishes; tags from bots or other accounts stop here.
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # The environment accepts only v* tags and holds the NUGET_USER variable.
+    environment: nuget
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: nuget-packages
+          path: nuget
+
+      - name: Verify the checksums
+        working-directory: nuget
+        run: sha256sum --check SHA256SUMS
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Log in to nuget.org (Trusted Publishing)
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          for package in Abstractions Core Modbus OpcUa; do
+            dotnet nuget push "nuget/Proxus.Drivers.$package.${{ needs.pack.outputs.version }}.nupkg" \
+              --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done

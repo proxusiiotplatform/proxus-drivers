@@ -25,8 +25,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
       - name: Build
@@ -44,13 +44,16 @@ jobs:
   packages:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
       - name: Pack and check
         run: |
           for p in Abstractions Core Modbus OpcUa; do
-            dotnet pack src/Proxus.Drivers.$p/Proxus.Drivers.$p.csproj -c Release -o artifacts/nuget
+            dotnet pack src/Proxus.Drivers.$p/Proxus.Drivers.$p.csproj -c Release -o artifacts/nuget \
+              -p:ContinuousIntegrationBuild=true -p:ProxusOpenRepository=true
           done
-          python3 tools/check_packages.py artifacts/nuget 0.1.0
+          python3 tools/check_packages.py artifacts/nuget 0.1.0 --open

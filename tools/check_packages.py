@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Checks the NuGet packages of ADR 0042 before anyone can publish them.
 
-Usage: check_packages.py <directory> <version>
+Usage: check_packages.py <directory> <version> [--open]
+
+--open checks packages built in the public proxus-drivers repository (ADR 0044): there the nuspec must name that
+repository and the commit, and the PDB must carry Source Link to it. Everything else is the same.
 
 For every expected package id the directory must hold <id>.<version>.nupkg and <id>.<version>.snupkg, and:
 - the .nupkg holds exactly the assembly, its XML documentation, README.md and NuGet's own files;
@@ -34,6 +37,7 @@ SOURCE_SUFFIXES = (".cs", ".csproj", ".props", ".targets", ".py", ".sh", ".c", "
 EMBEDDED_SOURCE = uuid.UUID("0E8A571B-6926-466E-B4AD-8AB04611F5FE")
 SOURCE_LINK = uuid.UUID("CC110556-A091-4D38-9FEC-25AB9A351A6A")
 ROOT = Path(__file__).resolve().parents[1]
+OPEN_REPOSITORY = "https://github.com/proxusiiotplatform/proxus-drivers"
 LOCAL_PATHS = [str(ROOT).encode(), b"/Users/", b"/home/", b"C:\\Users\\", b"/runner/work/", b"D:\\a\\"]
 
 
@@ -41,17 +45,21 @@ def fail(errors: list[str], message: str) -> None:
     errors.append(message)
 
 
-def check_binary(errors: list[str], name: str, data: bytes) -> None:
+def check_binary(errors: list[str], name: str, data: bytes, open_repository: bool) -> None:
     for marker in LOCAL_PATHS:
         if marker in data:
             fail(errors, f"{name}: contains the build path {marker.decode(errors='replace')!r}")
     if name.endswith(".pdb"):
-        for kind, label in ((EMBEDDED_SOURCE, "embedded sources"), (SOURCE_LINK, "Source Link")):
-            if kind.bytes_le in data:
-                fail(errors, f"{name}: carries {label}")
+        if EMBEDDED_SOURCE.bytes_le in data:
+            fail(errors, f"{name}: carries embedded sources")
+        has_source_link = SOURCE_LINK.bytes_le in data
+        if open_repository and not has_source_link:
+            fail(errors, f"{name}: has no Source Link to the public repository")
+        if not open_repository and has_source_link:
+            fail(errors, f"{name}: carries Source Link")
 
 
-def check(directory: Path, version: str) -> list[str]:
+def check(directory: Path, version: str, open_repository: bool = False) -> list[str]:
     errors: list[str] = []
     found = {p.name for p in directory.glob("*.nupkg")}
     expected = {f"{package}.{version}.nupkg" for package in PACKAGES}
@@ -75,7 +83,7 @@ def check(directory: Path, version: str) -> list[str]:
             for name in allowed - set(names):
                 fail(errors, f"{nupkg.name}: missing {name}")
             if f"lib/net10.0/{package}.dll" in names:
-                check_binary(errors, f"{nupkg.name}/{package}.dll", z.read(f"lib/net10.0/{package}.dll"))
+                check_binary(errors, f"{nupkg.name}/{package}.dll", z.read(f"lib/net10.0/{package}.dll"), open_repository)
             if "README.md" in names and not z.read("README.md").decode("utf-8").startswith(f"# {package}"):
                 fail(errors, f"{nupkg.name}: README.md is not this package's readme")
             root = ET.fromstring(z.read(f"{package}.nuspec"))
@@ -92,7 +100,12 @@ def check(directory: Path, version: str) -> list[str]:
                 fail(errors, f"{nupkg.name}: an Apache-2.0 package must not require licence acceptance")
             if text("readme") != "README.md" or not text("description"):
                 fail(errors, f"{nupkg.name}: readme or description missing")
-            if metadata.find("n:repository", ns) is not None or text("projectUrl"):
+            repository = metadata.find("n:repository", ns)
+            if open_repository:
+                commit = repository.get("commit", "") if repository is not None else ""
+                if repository is None or repository.get("url") != OPEN_REPOSITORY or len(commit) != 40:
+                    fail(errors, f"{nupkg.name}: must name {OPEN_REPOSITORY} and the commit it was built from")
+            elif repository is not None or text("projectUrl"):
                 fail(errors, f"{nupkg.name}: publishes a repository or project URL")
             dependencies = {d.get("id"): d.get("version") for d in metadata.iter(f"{{{ns['n']}}}dependency")}
             if dependencies != {sibling: f"[{version}]" for sibling in siblings}:
@@ -103,20 +116,23 @@ def check(directory: Path, version: str) -> list[str]:
             if set(names) != allowed:
                 fail(errors, f"{snupkg.name}: files {sorted(names)}, expected {sorted(allowed)}")
             if f"lib/net10.0/{package}.pdb" in names:
-                check_binary(errors, f"{snupkg.name}/{package}.pdb", z.read(f"lib/net10.0/{package}.pdb"))
+                check_binary(errors, f"{snupkg.name}/{package}.pdb", z.read(f"lib/net10.0/{package}.pdb"), open_repository)
     return errors
 
 
 def main() -> int:
-    if len(sys.argv) != 3:
+    arguments = [a for a in sys.argv[1:] if a != "--open"]
+    open_repository = "--open" in sys.argv[1:]
+    if len(arguments) != 2:
         print(__doc__)
         return 2
-    errors = check(Path(sys.argv[1]), sys.argv[2])
+    errors = check(Path(arguments[0]), arguments[1], open_repository)
     for error in errors:
         print(f"FAIL {error}")
     if errors:
         return 1
-    print(f"NuGet packages verified: {len(PACKAGES)} packages {sys.argv[2]} with symbols, no source or build paths.")
+    source = f"Source Link to {OPEN_REPOSITORY}" if open_repository else "no source or build paths"
+    print(f"NuGet packages verified: {len(PACKAGES)} packages {arguments[1]} with symbols, {source}.")
     return 0
 
 
